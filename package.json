@@ -1,0 +1,40 @@
+{
+  "name": "@dapp-builder/use-balances",
+  "version": "0.1.0",
+  "description": "A library to get user balances on EVM blockchains using the Multicall smart contract",
+  "keywords": [
+    "blockchains",
+    "balances",
+    "multicall"
+  ],
+  "author": "ngduythao",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngduythao/use-balances"
+  },
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "scripts": {
+    "start": "npm run build && cp ./dist ./public/dist",
+    "build": "npm run build:cjs && npm run build:esm && npm run types",
+    "build:esm": "esbuild src/index.ts --bundle --minify --format=esm --outfile=dist/index.esm.js",
+    "build:cjs": "esbuild src/index.ts --bundle --minify --platform=node --target=node14 --outfile=dist/index.cjs.js",
+    "types": "rm -rf ./dist/index.d.ts && tsc --emitDeclarationOnly --outDir ./dist",
+    "clean": "rm -rf dist"
+  },
+  "devDependencies": {
+    "esbuild": "^0.17.5",
+    "ethers": "^6.0.2",
+    "typescript": "^4.9.4"
+  }
+}

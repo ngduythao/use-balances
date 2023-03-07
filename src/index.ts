@@ -4,11 +4,12 @@ import {
   decodeBytes32String,
   getAddress,
   formatUnits,
+  parseUnits,
   Interface,
   JsonRpcProvider,
 } from "ethers";
 
-import type { Provider } from "ethers";
+import { Network, Provider } from "ethers";
 
 import {
   AggregateResponse,
@@ -19,27 +20,51 @@ import {
   CallContext,
   CallResult,
   MetaByContract,
-  MultipleAccountsSingleTokenRequest,
-  RawMultipleAccountsSingleTokenRequest,
-  RawSingleAccountsMultipleTokensRequest,
+  SingleTokenRequest,
+  RawSingleTokenRequest,
+  RawMultipleTokensRequest,
   ReturnData,
-  SingleAccountMultipleTokensRequest,
+  MultipleTokensRequest,
   TokenInfo,
 } from "./types";
 
-import erc20Abi from "./abi/erc20.json";
-import multicallAbi from "./abi/multicall.json";
+import { WNATIVE_ADDRESS, WNATIVE_PRCE_FEEDS_ADDRESS, V2_ROUTER_ADDRESS, MULTICALL, AddressMap } from './constants'
 
-const MULTICALL = "0xcA11bde05977b3631167028862bE2a173976CA11";
+import erc20Abi from "./abi/erc20.json";
+import v2RouterAbi from './abi/v2Router.json'
+import multicallAbi from "./abi/multicall.json";
+import aggregatorV3Abi from "./abi/aggregatorV3.json";
+
+const ONE_ETHER = parseUnits('1', 'ether');
 
 const abiCoder = AbiCoder.defaultAbiCoder();
 
-export async function getBalancesMultipleAccountsSingleToken({
+export async function getNativePrice(rpcUrl: string) : Promise<bigint> {
+  const provider = new JsonRpcProvider(rpcUrl);
+  const chainId: string = await getChainId(provider);
+  return nativePrice(provider, chainId);
+}
+
+export async function getTokenPrice(tokenAddress: string, rpcUrl: string) : Promise<bigint> {
+  const provider = new JsonRpcProvider(rpcUrl);
+  const rawChainId = await getChainId(provider);
+  const chainId = Number(rawChainId) as keyof AddressMap;
+  const path = [tokenAddress, WNATIVE_ADDRESS[chainId]];
+
+  const routerContract = new Contract(V2_ROUTER_ADDRESS[chainId], v2RouterAbi, provider);
+  const tokenContract = new Contract(tokenAddress, erc20Abi, provider);
+
+  const [decimals, price] = await Promise.all([tokenContract.decimals(), nativePrice(provider, rawChainId)]);
+  const [, tokenInNative] = await routerContract.getAmountsOut(parseUnits('1', decimals), path);
+  return tokenInNative * price / ONE_ETHER;
+}
+
+export async function getBalancesSingleToken({
   userAddresses,
   contractToken,
   rpcUrl,
   chunkSize = 500,
-}: MultipleAccountsSingleTokenRequest & {
+}: SingleTokenRequest & {
   chunkSize?: number;
 }): Promise<Balances> {
   const provider = new JsonRpcProvider(rpcUrl);
@@ -63,12 +88,12 @@ export async function getBalancesMultipleAccountsSingleToken({
   });
 }
 
-export async function getBalancesSingleAccountMultipleTokens({
+export async function getBalanceMultipleTokens({
   userAddress,
   contractTokens,
   rpcUrl,
   chunkSize = 500,
-}: SingleAccountMultipleTokensRequest & {
+}: MultipleTokensRequest & {
   chunkSize?: number;
 }): Promise<BalancesByContract> {
   const provider = new JsonRpcProvider(rpcUrl);
@@ -96,7 +121,7 @@ async function fetchRawBalancesMultipleAccounts({
   userAddresses,
   contractToken,
   provider,
-}: RawMultipleAccountsSingleTokenRequest): Promise<CallResult[]> {
+}: RawSingleTokenRequest): Promise<CallResult[]> {
   const erc20Interface = new Interface(erc20Abi);
   const balanceCalls: Call[] = userAddresses.map((userAddress) => ({
     target: contractToken,
@@ -110,7 +135,7 @@ async function fetchRawBalancesMultipleTokens({
   userAddress,
   contractTokens,
   provider,
-}: RawSingleAccountsMultipleTokensRequest): Promise<CallResultWithAddress[]> {
+}: RawMultipleTokensRequest): Promise<CallResultWithAddress[]> {
   const erc20Interface = new Interface(erc20Abi);
   const balanceCalls: Call[] = contractTokens.map((tokenAddress) => ({
     target: tokenAddress,
@@ -217,6 +242,16 @@ async function aggregate(calls: Call[], provider: Provider) : Promise<CallResult
   const contract = new Contract(MULTICALL, multicallAbi, provider);
   const { 2: results } : AggregateResponse = await contract.tryBlockAndAggregate.staticCall(false, calls);
   return results;
+}
+
+async function getChainId(provider: Provider) : Promise<string> {
+  return provider.getNetwork().then((network: Network) => network.chainId.toString());
+}
+
+async function nativePrice(provider: Provider, chainId: string) : Promise<bigint> {
+  const priceFeedContract = new Contract(WNATIVE_PRCE_FEEDS_ADDRESS[Number(chainId) as keyof AddressMap], aggregatorV3Abi, provider);
+  const [, price, , , ] = await priceFeedContract?.latestRoundData();
+  return parseUnits(price.toString(), 10);
 }
 
 function chunk<T>(array: T[], size: number) {

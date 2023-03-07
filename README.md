@@ -13,7 +13,10 @@ npm install @dapp-builder/use-balances
 
 ```typescript
 import { 
-  getBalancesMultipleAccountsSingleToken, getBalancesSingleAccountMultipleTokens 
+  getBalancesSingleToken,
+  getBalanceMultipleTokens,
+  getNativePrice,
+  getTokenPrice
 } from "@dapp-builder/use-balances";
 
 const BSC_RPC_URL = "https://bsc-dataseed1.ninicoin.io";
@@ -30,7 +33,7 @@ const contractTokens = [
 
 let balances;
 
-balances = await getBalancesSingleAccountMultipleTokens({
+balances = await getBalanceMultipleTokens({
   userAddress: userAddresses[0],
   contractTokens,
   rpcUrl: BSC_RPC_URL,
@@ -38,13 +41,19 @@ balances = await getBalancesSingleAccountMultipleTokens({
 
 console.log(balances);
 
-balances = await getBalancesMultipleAccountsSingleToken({
+balances = await getBalancesSingleToken({
   userAddresses,
   contractToken: contractTokens[0],
   rpcUrl: BSC_RPC_URL
 })
 
 console.log(balances);
+
+const price = await getNativePrice(BSC_RPC_URL);
+console.log(price.toString())
+
+const tokenPrice = await getTokenPrice(yuAddress, BSC_RPC_URL);
+console.log(tokenPrice.toString())
 
 ```
 

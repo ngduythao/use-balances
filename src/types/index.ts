@@ -28,25 +28,25 @@ export interface CallContext {
   methodName: string;
 }
 
-export interface MultipleAccountsSingleTokenRequest {
+export interface SingleTokenRequest {
   userAddresses: string[];
   contractToken: string;
   rpcUrl: string;
 }
 
-export interface RawMultipleAccountsSingleTokenRequest {
+export interface RawSingleTokenRequest {
   userAddresses: string[];
   contractToken: string;
   provider: Provider;
 }
 
-export interface RawSingleAccountsMultipleTokensRequest {
+export interface RawMultipleTokensRequest {
   userAddress: string;
   contractTokens: string[];
   provider: Provider;
 }
 
-export interface SingleAccountMultipleTokensRequest {
+export interface MultipleTokensRequest {
   userAddress: string;
   contractTokens: string[];
   rpcUrl: string;

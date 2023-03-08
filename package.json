@@ -1,11 +1,12 @@
 {
-  "name": "@dapp-builder/use-balances",
-  "version": "0.1.5",
-  "description": "A library to get user balances on EVM blockchains using the Multicall smart contract",
+  "name": "@dapp-builder/use-muticall",
+  "version": "0.1.0",
+  "description": "A library to get user balances or tokens price on EVM blockchains using the Multicall smart contract",
   "keywords": [
     "blockchains",
     "balances",
-    "multicall"
+    "multicall",
+    "token-price"
   ],
   "author": "ngduythao",
   "license": "MIT",

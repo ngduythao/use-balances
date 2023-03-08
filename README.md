@@ -1,11 +1,11 @@
-# ⟠ use-balances ⟠
+# ⟠ use-muticall ⟠
 
-A library to get user [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) balances on EVM blockchains using the Multicall smart contract
+A library to get user [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) balances and tokens price on EVM blockchains using the Multicall smart contract
 
 ## Installation
 
 ```
-npm install @dapp-builder/use-balances
+npm install @dapp-builder/use-muticall
 
 ```
 
@@ -17,7 +17,7 @@ import {
   getBalanceMultipleTokens,
   getNativePrice,
   getTokensPrice,
-} from "@dapp-builder/use-balances";
+} from "@dapp-builder/use-muticall";
 
 const BSC_RPC_URL = "https://bsc-dataseed1.ninicoin.io";
 
@@ -54,8 +54,8 @@ console.log(price.toString())
 
 const tokensPrice = await getTokensPrice(
     [
-      "0x3e098C23DCFBbE0A3f468A6bEd1cf1a59DC1770D",
-      "0x9E0335fb61958Fe19Bb120F3F8408B4297921820",
+      "0x3e098C23DCFBbE0A3f468A6bEd1cf1a59DC1770D", // YU
+      "0x9E0335fb61958Fe19Bb120F3F8408B4297921820", // FFE
     ],
     BSC_RPC_URL
   );
@@ -65,7 +65,17 @@ console.log(tokensPrice.map((price) => price.toString()));
 
 ## Supports
 
-The below networks are supported 
+The below networks are supported when getting token price
+| Chain                   | Chain ID   |
+| ----------------------- | ---------- |
+| Mainnet                 | 1          |
+| Arbitrum                | 420        |
+| Avalanche               | 43114      |
+| BNB Smart Chain         | 56         |
+| Polygon                 | 421613     |
+| Optimism                | 137        |
+
+The below networks are supported when getting balances
 
 | Chain                   | Chain ID   |
 | ----------------------- | ---------- |

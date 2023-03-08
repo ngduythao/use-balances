@@ -1,6 +1,6 @@
 {
   "name": "@dapp-builder/use-balances",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A library to get user balances on EVM blockchains using the Multicall smart contract",
   "keywords": [
     "blockchains",

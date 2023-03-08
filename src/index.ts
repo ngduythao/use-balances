@@ -51,34 +51,54 @@ export async function getNativePrice(rpcUrl: string): Promise<bigint> {
   return nativePrice(provider, chainId);
 }
 
-export async function getTokenPrice(
-  tokenAddress: string,
+export async function getTokensPrice(
+  contractTokens: string[],
   rpcUrl: string
-): Promise<bigint> {
+): Promise<bigint[]> {
   const provider = new JsonRpcProvider(rpcUrl);
   const rawChainId = await getChainId(provider);
   const chainId = Number(rawChainId) as keyof AddressMap;
-  const path = [
-    getAddress(tokenAddress),
-    WNATIVE_ADDRESS[chainId],
-  ];
 
   const routerContract = new Contract(
     V2_ROUTER_ADDRESS[chainId],
     v2RouterAbi,
     provider
   );
-  const tokenContract = new Contract(tokenAddress, erc20Abi, provider);
 
-  const [decimals, price] = await Promise.all([
-    tokenContract.decimals(),
-    nativePrice(provider, rawChainId),
+  const paths = contractTokens.map((tokenAddress) => [
+    getAddress(tokenAddress),
+    WNATIVE_ADDRESS[chainId],
   ]);
-  const [, tokenInNative] = await routerContract.getAmountsOut(
-    parseUnits("1", decimals),
-    path
+
+  const [price, callResults]: [bigint, CallResultWithAddress[]] =
+    await Promise.all([
+      nativePrice(provider, rawChainId),
+      fetchRawInfoMultipleTokens({
+        contractTokens,
+        functionName: "decimals",
+        callData: [],
+        provider,
+        chunkSize: 500,
+      }),
+    ]);
+
+  const decimals = callResults.map((result) => {
+    const decoded = abiCoder.decode(["uint256"], result[2]);
+    return decoded.toString();
+  });
+
+  const results: [bigint, bigint][] = await Promise.all(
+    paths.map((path, index) =>
+      routerContract.getAmountsOut(
+        parseUnits("1", Number(decimals[index])),
+        path
+      )
+    )
   );
-  return (tokenInNative * price) / ONE_ETHER;
+
+  return results.map(
+    ([, tokenInNative]) => (tokenInNative * price) / ONE_ETHER
+  );
 }
 
 export async function getBalancesSingleToken({
@@ -114,13 +134,15 @@ export async function getBalanceMultipleTokens({
   chunkSize?: number;
 }): Promise<BalancesByContract> {
   const provider = new JsonRpcProvider(rpcUrl);
-  const callResults: CallResultWithAddress[] = await fetchRawInfoMultipleTokens({
-    contractTokens,
-    functionName: "balanceOf",
-    callData: [getAddress(userAddress)],
-    provider,
-    chunkSize,
-  });
+  const callResults: CallResultWithAddress[] = await fetchRawInfoMultipleTokens(
+    {
+      contractTokens,
+      functionName: "balanceOf",
+      callData: [getAddress(userAddress)],
+      provider,
+      chunkSize,
+    }
+  );
   const rawBalances = resultDataByAddress(callResults);
   const { calls, context } = buildCallsContext(callResults);
   const metaResults = await aggregate(calls, provider);

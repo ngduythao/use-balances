@@ -16,15 +16,15 @@ import {
   getBalancesSingleToken,
   getBalanceMultipleTokens,
   getNativePrice,
-  getTokenPrice
+  getTokensPrice,
 } from "@dapp-builder/use-balances";
 
 const BSC_RPC_URL = "https://bsc-dataseed1.ninicoin.io";
 
 const userAddresses = [
-    "0xF977814e90dA44bFA03b6295A0616a897441aceC", // Binance hot wallet
-    "0x8894E0a0c962CB723c1976a4421c95949bE2D4E3", // Binance hot wallet
-  ]; 
+  "0xF977814e90dA44bFA03b6295A0616a897441aceC", // Binance wallet
+  "0x8894E0a0c962CB723c1976a4421c95949bE2D4E3", // Binance wallet
+];
 
 const contractTokens = [
   "0x55d398326f99059fF775485246999027B3197955", // USDT
@@ -52,8 +52,14 @@ console.log(balances);
 const price = await getNativePrice(BSC_RPC_URL);
 console.log(price.toString())
 
-const tokenPrice = await getTokenPrice(yuAddress, BSC_RPC_URL);
-console.log(tokenPrice.toString())
+const tokensPrice = await getTokensPrice(
+    [
+      "0x3e098C23DCFBbE0A3f468A6bEd1cf1a59DC1770D",
+      "0x9E0335fb61958Fe19Bb120F3F8408B4297921820",
+    ],
+    BSC_RPC_URL
+  );
+console.log(tokensPrice.map((price) => price.toString()));
 
 ```
 

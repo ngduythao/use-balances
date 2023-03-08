@@ -37,13 +37,17 @@ export interface SingleTokenRequest {
 export interface RawSingleTokenRequest {
   userAddresses: string[];
   contractToken: string;
+  functionName: string,
   provider: Provider;
+  chunkSize?: number
 }
 
 export interface RawMultipleTokensRequest {
   userAddress: string;
   contractTokens: string[];
+  functionName: string;
   provider: Provider;
+  chunkSize?: number;
 }
 
 export interface MultipleTokensRequest {

@@ -115,9 +115,9 @@ export async function getBalanceMultipleTokens({
 }): Promise<BalancesByContract> {
   const provider = new JsonRpcProvider(rpcUrl);
   const callResults: CallResultWithAddress[] = await fetchRawInfoMultipleTokens({
-    userAddress: getAddress(userAddress),
     contractTokens,
     functionName: "balanceOf",
+    callData: [getAddress(userAddress)],
     provider,
     chunkSize,
   });
@@ -160,9 +160,9 @@ async function fetchRawInfoAccounts({
 }
 
 async function fetchRawInfoMultipleTokens({
-  userAddress,
   contractTokens,
   functionName,
+  callData,
   provider,
   chunkSize = 500,
 }: RawMultipleTokensRequest): Promise<CallResultWithAddress[]> {
@@ -173,9 +173,7 @@ async function fetchRawInfoMultipleTokens({
     chunked.map((chunk) => {
       const calls: Call[] = chunk.map((tokenAddress) => ({
         target: tokenAddress,
-        callData: erc20Interface.encodeFunctionData(functionName, [
-          userAddress,
-        ]),
+        callData: erc20Interface.encodeFunctionData(functionName, callData),
       }));
       return aggregate(calls, provider);
     })

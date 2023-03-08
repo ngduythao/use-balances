@@ -43,9 +43,9 @@ export interface RawSingleTokenRequest {
 }
 
 export interface RawMultipleTokensRequest {
-  userAddress: string;
   contractTokens: string[];
   functionName: string;
+  callData: string[];
   provider: Provider;
   chunkSize?: number;
 }

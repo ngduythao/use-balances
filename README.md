@@ -72,8 +72,8 @@ The below networks are supported when getting token price
 | Arbitrum                | 420        |
 | Avalanche               | 43114      |
 | BNB Smart Chain         | 56         |
-| Polygon                 | 421613     |
-| Optimism                | 137        |
+| Polygon                 | 137        |
+| Optimism                | 10         |
 
 The below networks are supported when getting balances
 
@@ -85,13 +85,13 @@ The below networks are supported when getting balances
 | Görli                   | 5          |
 | Ropsten                 | 10         |
 | Sepolia                 | 42         |
-| Optimism                | 137        |
+| Optimism                | 10         |
 | Optimism Kovan          | 69         |
 | Optimism Görli          | 100        |
 | Arbitrum                | 420        |
 | Arbitrum Görli          | 42161      |
 | Arbitrum Rinkeby        | 421611     |
-| Polygon                 | 421613     |
+| Polygon                 | 137        |
 | Mumbai                  | 80001      |
 | Gnosis Chain (xDai)     | 11155111   |
 | Avalanche               | 43114      |

@@ -7,9 +7,10 @@ import {
   parseUnits,
   Interface,
   JsonRpcProvider,
+  Network, 
+  Provider
 } from "ethers";
 
-import { Network, Provider } from "ethers";
 
 import {
   AggregateResponse,

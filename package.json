@@ -1,6 +1,6 @@
 {
   "name": "@dapp-builder/use-muticall",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A library to get user balances or tokens price on EVM blockchains using the Multicall smart contract",
   "keywords": [
     "blockchains",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.17.5",
-    "ethers": "^6.0.2",
+    "ethers": "^6.1.0",
     "typescript": "^4.9.4"
   }
 }

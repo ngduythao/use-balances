@@ -1,6 +1,6 @@
 # ⟠ use-muticall ⟠
 
-A library to get user [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) balances and tokens price on EVM blockchains using the Multicall smart contract
+A library to get user [ERC-20](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) balances and tokens price on EVM blockchains using the [Multicall smart contract](https://github.com/joshstevens19/ethereum-multicall/)
 
 ## Installation
 

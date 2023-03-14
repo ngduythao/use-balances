@@ -10,4 +10,8 @@ export enum SupportedChainId {
   POLYGON_MAINET = 137,
   
   AVALANCHE = 43114,
+
+  FUJI = 43113,
+
+  MUMBAI = 80001
 }

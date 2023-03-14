@@ -71,8 +71,10 @@ The below networks are supported when getting token price
 | Mainnet                 | 1          |
 | Arbitrum                | 420        |
 | Avalanche               | 43114      |
+| Fuji                    | 43113      |
 | BNB Smart Chain         | 56         |
 | Polygon                 | 137        |
+| Mumbai                  | 80001      |
 | Optimism                | 10         |
 
 The below networks are supported when getting balances

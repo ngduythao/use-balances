@@ -11,7 +11,7 @@ export const WNATIVE_ADDRESS: AddressMap = {
   [SupportedChainId.POLYGON_MAINET]: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
   [SupportedChainId.ARBITRUM_ONE]: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
   [SupportedChainId.OPTIMISM]: '0x4200000000000000000000000000000000000006',
-  [SupportedChainId.FUJI]: '',
+  [SupportedChainId.FUJI]: '0xd00ae08403B9bbb9124bB305C09058E32C39A48c',
   [SupportedChainId.MUMBAI]: ''
 }
 
@@ -33,7 +33,7 @@ export const V2_ROUTER_ADDRESS: AddressMap = {
   [SupportedChainId.POLYGON_MAINET]: '0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff', // QuickSwap
   [SupportedChainId.ARBITRUM_ONE]: '',
   [SupportedChainId.OPTIMISM]: '',
-  [SupportedChainId.FUJI]: '',
+  [SupportedChainId.FUJI]: '0x1E58825113886D1F2B32cB3a83c3294D620F2a89',
   [SupportedChainId.MUMBAI]: ''
 }
 

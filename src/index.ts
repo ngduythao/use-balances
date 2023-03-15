@@ -1,16 +1,4 @@
-import {
-  AbiCoder,
-  Contract,
-  decodeBytes32String,
-  getAddress,
-  formatUnits,
-  parseUnits,
-  Interface,
-  JsonRpcProvider,
-  Network, 
-  Provider
-} from "ethers";
-
+import { utils, providers, Contract, BigNumber } from "ethers";
 
 import {
   AggregateResponse,
@@ -27,6 +15,7 @@ import {
   ReturnData,
   MultipleTokensRequest,
   TokenInfo,
+  Network
 } from "./types";
 
 import {
@@ -42,11 +31,14 @@ import v2RouterAbi from "./abi/v2Router.json";
 import multicallAbi from "./abi/multicall.json";
 import aggregatorV3Abi from "./abi/aggregatorV3.json";
 
+const { JsonRpcProvider } = providers;
+const { defaultAbiCoder, formatUnits,  getAddress, parseUnits, parseBytes32String, Interface } = utils;
+
 const ONE_ETHER = parseUnits("1", "ether");
 
-const abiCoder = AbiCoder.defaultAbiCoder();
+const abiCoder = defaultAbiCoder;
 
-export async function getNativePrice(rpcUrl: string): Promise<bigint> {
+export async function getNativePrice(rpcUrl: string): Promise<BigNumber> {
   const provider = new JsonRpcProvider(rpcUrl);
   const chainId: string = await getChainId(provider);
   return nativePrice(provider, chainId);
@@ -55,7 +47,7 @@ export async function getNativePrice(rpcUrl: string): Promise<bigint> {
 export async function getTokensPrice(
   contractTokens: string[],
   rpcUrl: string
-): Promise<bigint[]> {
+): Promise<BigNumber[]> {
   const provider = new JsonRpcProvider(rpcUrl);
   const rawChainId = await getChainId(provider);
   const chainId = Number(rawChainId) as keyof AddressMap;
@@ -71,7 +63,7 @@ export async function getTokensPrice(
     WNATIVE_ADDRESS[chainId],
   ]);
 
-  const [price, callResults]: [bigint, CallResultWithAddress[]] =
+  const [price, callResults]: [BigNumber, CallResultWithAddress[]] =
     await Promise.all([
       nativePrice(provider, rawChainId),
       fetchRawInfoMultipleTokens({
@@ -88,7 +80,7 @@ export async function getTokensPrice(
     return decoded.toString();
   });
 
-  const results: [bigint, bigint][] = await Promise.all(
+  const results: [BigNumber, BigNumber][] = await Promise.all(
     paths.map((path, index) =>
       routerContract.getAmountsOut(
         parseUnits("1", Number(decimals[index])),
@@ -98,8 +90,8 @@ export async function getTokensPrice(
   );
 
   return results.map(
-    ([, tokenInNative]) => (tokenInNative * price) / ONE_ETHER
-  );
+    ([, tokenInNative]) => (BigNumber.from(tokenInNative).mul(price).div(ONE_ETHER)
+  ));
 }
 
 export async function getBalancesSingleToken({
@@ -262,7 +254,7 @@ function decodeMetaResults(
       [methodValue] = abiCoder.decode([type], data);
     } catch (error) {
       console.info(`Error ${methodName} - ${contractAddress}`);
-      methodValue = decodeBytes32String(data);
+      methodValue = parseBytes32String(data);
     }
 
     if (methodName === "decimals") {
@@ -306,24 +298,24 @@ function balancesByContract(
 
 async function aggregate(
   calls: Call[],
-  provider: Provider
+  provider: providers.Provider
 ): Promise<CallResult[]> {
   const contract = new Contract(MULTICALL, multicallAbi, provider);
   const { 2: results }: AggregateResponse =
-    await contract.tryBlockAndAggregate.staticCall(false, calls);
+    await contract.callStatic.tryBlockAndAggregate(false, calls);
   return results;
 }
 
-async function getChainId(provider: Provider): Promise<string> {
+async function getChainId(provider: providers.Provider): Promise<string> {
   return provider
     .getNetwork()
-    .then((network: Network) => network.chainId.toString());
+    .then((network: Network) => network?.chainId.toString());
 }
 
 async function nativePrice(
-  provider: Provider,
+  provider: providers.Provider,
   chainId: string
-): Promise<bigint> {
+): Promise<BigNumber> {
   const priceFeedContract = new Contract(
     WNATIVE_PRCE_FEEDS_ADDRESS[Number(chainId) as keyof AddressMap],
     aggregatorV3Abi,

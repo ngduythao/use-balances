@@ -1,4 +1,4 @@
-import type { BytesLike, Provider } from "ethers";
+import type { BytesLike, BigNumber, providers } from "ethers";
 
 export type BlockHash = string;
 
@@ -12,7 +12,7 @@ export type CallResult = [Success, ReturnData];
 
 export type CallResultWithAddress = [ContractAddress, Success, ReturnData];
 
-export type AggregateResponse = [bigint, BlockHash, CallResult[]];
+export type AggregateResponse = [BigNumber, BlockHash, CallResult[]];
 
 export type Balances = string[];
 
@@ -38,7 +38,7 @@ export interface RawSingleTokenRequest {
   userAddresses: string[];
   contractToken: string;
   functionName: string,
-  provider: Provider;
+  provider: providers.Provider;
   chunkSize?: number
 }
 
@@ -46,7 +46,7 @@ export interface RawMultipleTokensRequest {
   contractTokens: string[];
   functionName: string;
   callData: string[];
-  provider: Provider;
+  provider: providers.Provider;
   chunkSize?: number;
 }
 
@@ -67,3 +67,10 @@ export type TokenInfoWithoutBalance = Record<
 >;
 
 export type MetaByContract = Record<string, TokenInfoWithoutBalance>;
+
+export type Network = {
+  name: string,
+  chainId: number,
+  ensAddress?: string,
+  _defaultProvider?: (providers: any, options?: any) => any
+}
